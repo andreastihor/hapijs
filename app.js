@@ -1,4 +1,5 @@
 const Hapi = require('hapi');
+const Joi = require('joi');
 
 
 const {Article} = require('./Model/Articles.js')
@@ -10,37 +11,26 @@ const server = Hapi.server({
 
 const runServer = async () => {
 
-	await server.register(require('inert'));
-	await server.register(require('vision'));
+	
 	await server.start();
-
-	server.views({
-        engines: {
-            html: require('handlebars')
-        },
-        relativeTo: __dirname,
-        path: 'View',
-
-    });
 
 	console.log(`server is running on ${server.info.uri}`);
 }
 
 
-// process.on('unhandledRejection', (err) => {
+process.on('unhandledRejection', (err) => {
 
-//     console.log(err);
-//     process.exit(1);
-// });
+    console.log(err);
+    process.exit(1);
+});
 
 server.route( {
 	method : 'GET',
 	path : '/',
 	handler : (req,res) => {
-		// return res.file('./View/home.html');
-		const mod = Article.findAll();
 		
-		 return res.view('home',{articles : mod } );
+		const mod = Article.findAll();
+		return mod;
 	}
 });
 
@@ -48,16 +38,30 @@ server.route({
 	method: 'GET',
 	path: '/login',
 	handler : (req,res) => {
-		return res.file('View/login.html');
+
+		const obj = {name: "login page"};
+		return obj;
 	}
 });
 
 server.route({
 	method: 'POST',
 	path: '/login',
-	handler : (req,res) => {
-		return "LOGIN HERE";
+	config : {
+		handler : (req,res) => {
+
+		const obj = req.payload;
+		return obj;
+		},
+
+		validate: {
+			payload: {
+				email : Joi.string().email({minDomainsAtoms: 2}).required(),
+				password : Joi.string().alphanum().required()
+			}
+		}
 	}
+		
 });
 
 
@@ -65,15 +69,35 @@ server.route({
 	method: 'GET',
 	path: '/register',
 	handler : (req,res) => {
-		return res.file('./View/register.html');
+
+		const obj = { name:  "register page" };
+		return obj
+
+		
 	}
 })
 
 server.route({
 	method: 'POST',
 	path: '/register',
+	
+	config :  {
+
 	handler : (req,res) => {
-		return "Register here! "
+
+		const obj = req.payload;
+		return obj;
+	},
+
+	validate : {
+		payload : {
+			name : Joi.string().min(5).required(),
+			password : Joi.string().alphanum().required().min(8),
+			email : Joi.string().min(5).required().email({minDomainsAtoms: 2}),
+			dob : Joi.number()
+		}
+	}
+
 	}
 })
 
