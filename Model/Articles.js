@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
-const connection = new Sequelize('sequelize','root','', {
-	dialect : 'mysql'
+const connection = new Sequelize('test','postgres','admin', {
+	dialect : 'postgresql'
 });
 
 
