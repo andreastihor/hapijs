@@ -1,5 +1,7 @@
 const Hapi = require('hapi');
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
+const Boom = require('boom');
 
 
 const {Article} = require('./Model/Articles.js')
@@ -20,9 +22,17 @@ const runServer = async () => {
 
 process.on('unhandledRejection', (err) => {
 
-    console.log(err);
-    process.exit(1);
+	console.log(err);
+	process.exit(1);
 });
+
+const user = {
+	id : 1,
+	username : "andreas@gmail.com",
+	password : "tihor",
+	status : "admin"
+}
+
 
 server.route( {
 	method : 'GET',
@@ -34,15 +44,7 @@ server.route( {
 	}
 });
 
-server.route({
-	method: 'GET',
-	path: '/login',
-	handler : (req,res) => {
 
-		const obj = {name: "login page"};
-		return obj;
-	}
-});
 
 server.route({
 	method: 'POST',
@@ -50,32 +52,30 @@ server.route({
 	config : {
 		handler : (req,res) => {
 
-		const obj = req.payload;
-		return obj;
+			if (req.payload.username != user.username) {
+				return Boom.badRequest('Wrong email!');
+				
+			}
+
+			if (req.payload.password != user.password) {
+				return Boom.badRequest('Wrong Password!');
+			}
+			const token = jwt.sign({user} , 'secret');
+			return token;
 		},
 
 		validate: {
 			payload: {
-				email : Joi.string().email({minDomainsAtoms: 2}).required(),
+				username : Joi.string().email({minDomainsAtoms: 2}).required(),
 				password : Joi.string().alphanum().required()
 			}
 		}
 	}
-		
+	
 });
 
 
-server.route({
-	method: 'GET',
-	path: '/register',
-	handler : (req,res) => {
 
-		const obj = { name:  "register page" };
-		return obj
-
-		
-	}
-})
 
 server.route({
 	method: 'POST',
@@ -83,20 +83,25 @@ server.route({
 	
 	config :  {
 
-	handler : (req,res) => {
+		handler : (req,res) => {
 
-		const obj = req.payload;
-		return obj;
-	},
 
-	validate : {
-		payload : {
-			name : Joi.string().min(5).required(),
-			password : Joi.string().alphanum().required().min(8),
-			email : Joi.string().min(5).required().email({minDomainsAtoms: 2}),
-			dob : Joi.number()
+			const fullname = res.payload.fullname;
+			const email = res.payload.email;
+			const password = bcrypt(res.payload.password);
+			const dob = res.payload.dob;
+			
+			
+		},
+
+		validate : {
+			payload : {
+				fullname : Joi.string().min(5).required(),
+				password : Joi.string().alphanum().required().min(8),
+				email : Joi.string().min(5).required().email({minDomainsAtoms: 2}),
+				dob : Joi.number()
+			}
 		}
-	}
 
 	}
 })
