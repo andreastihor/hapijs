@@ -2,7 +2,8 @@ const Hapi = require('hapi');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const Boom = require('boom');
-
+const authBasic = require('hapi-auth-basic');
+const authCookie = require('hapi-auth-cookie');
 
 const {Article} = require('./Model/Articles.js')
 
@@ -13,48 +14,21 @@ const server = Hapi.server({
 
 const runServer = async () => {
 
-	
-	await server.start();
+	await server.register(authCookie);
+	await server.register(authBasic);
+	server.auth.strategy('simple','basic' , {validate});
 
-	console.log(`server is running on ${server.info.uri}`);
-}
-
-
-process.on('unhandledRejection', (err) => {
-
-	console.log(err);
-	process.exit(1);
-});
-
-const user = {
-	id : 1,
-	username : "andreas@gmail.com",
-	password : "tihor",
-	status : "admin"
-}
-
-
-server.route( {
-	method : 'GET',
-	path : '/',
-	handler : (req,res) => {
-		
-		const mod = Article.findAll();
-		return mod;
-	}
-});
-
-
-
-server.route({
+	try {
+	server.route({
 	method: 'POST',
 	path: '/login',
-	config : {
+	
+	options : {
 		handler : (req,res) => {
 
 			if (req.payload.username != user.username) {
 				return Boom.badRequest('Wrong email!');
-				
+
 			}
 
 			if (req.payload.password != user.password) {
@@ -69,10 +43,55 @@ server.route({
 				username : Joi.string().email({minDomainsAtoms: 2}).required(),
 				password : Joi.string().alphanum().required()
 			}
-		}
+		},
+
+		auth : 'simple'
 	}
-	
+
+}); } catch(err) {
+		console.log(err);
+		process.exit(1);
+	}
+	await server.start();
+
+	console.log(`server is running on ${server.info.uri}`);
+}
+
+const validate = async (request, username, password,reply) => {
+// TODO
+
+if (username != user.username) {
+	return Boom.badRequest('username not found!');
+}
+
+if (password != user.password) {
+	return Boom.badRequest('password not match')
+}
+return user;
+
+}
+
+const user = {
+	id : 1,
+	username : "andreas@gmail.com",
+	password : "tihor",
+	status : "admin"
+}
+
+
+server.route( {
+	method : 'GET',
+	path : '/',
+	handler : (req,res) => {
+
+		const mod = Article.findAll();
+		return mod;
+	}
 });
+
+
+
+
 
 
 
@@ -80,7 +99,7 @@ server.route({
 server.route({
 	method: 'POST',
 	path: '/register',
-	
+
 	config :  {
 
 		handler : (req,res) => {
@@ -90,8 +109,8 @@ server.route({
 			const email = res.payload.email;
 			const password = bcrypt(res.payload.password);
 			const dob = res.payload.dob;
-			
-			
+
+
 		},
 
 		validate : {
