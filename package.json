@@ -1,7 +1,7 @@
 {
   "name": "todo-taralite",
   "version": "1.0.0",
-  "description": "baca notes todo hapijs",
+  "description": "simple hapi authentication application with hapi-auth-basic and hapi-auth-cookie",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
