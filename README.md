@@ -1,5 +1,5 @@
 # hapijs
-hapijs simple authentication
+hapijs simple authentication app
 
 
 hapi js simple login authentication with basic auth 
