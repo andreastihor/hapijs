@@ -1,17 +1,14 @@
-const db = require('./DB.js');
-const Sequelize = require('sequelize')
-
-const User = db.define('user', {
-	fullname : Sequelize.TEXT,
-	email : Sequelize.TEXT,
-	password : Sequelize.TEXT,
-	username : Sequelize.TEXT,
-	dob : Sequelize.INTEGER
-
-});
-
-User.sync();
-
-module.exports = {
-	User
-}
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('user', {
+    fullname: DataTypes.STRING,
+    username: DataTypes.STRING,
+    password: DataTypes.STRING,
+  }, {
+    
+  });
+  User.associate = function(models) {
+    // associations can be defined here
+  };
+  return User;
+};

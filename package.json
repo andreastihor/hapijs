@@ -1,7 +1,7 @@
 {
   "name": "todo-taralite",
   "version": "1.0.0",
-  "description": "simple hapi authentication application with hapi-auth-basic and hapi-auth-cookie",
+  "description": "baca notes todo hapijs",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,13 +11,16 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "boom": "^7.3.0",
+    "dotenv": "^6.2.0",
     "hapi": "^17.8.1",
     "hapi-auth-basic": "^5.0.0",
     "hapi-auth-cookie": "^9.1.0",
     "hapi-auth-jwt2": "^8.3.0",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
+    "mysql2": "^1.6.4",
     "pg": "^7.7.1",
-    "sequelize": "^4.42.0"
+    "sequelize": "^4.42.0",
+    "sequelize-cli": "^5.4.0"
   }
 }
